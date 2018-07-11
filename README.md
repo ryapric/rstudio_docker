@@ -1,5 +1,5 @@
 Spooler for an RStudio Container Instance
-===============================================
+=========================================
 
 The script included here, `rstudio.sh`, works to pull a version-stable R Docker
 image (3.5.0) that includes some useful, portable utilities pre-compiled:
