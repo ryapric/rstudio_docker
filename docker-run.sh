@@ -2,7 +2,7 @@
 set -e
 
 # Specify rocker/tidyverse image
-R_version="3.5.0"
+R_version="3.5.1"
 rocker_image="rocker/tidyverse:${R_version}"
 
 # Specify docker_run script to iteratively build
@@ -14,6 +14,9 @@ rstudio_home="/home/rstudio"
 # RStudio Server port binding
 rstudio_port="8787"
 
+# You now need to give RStudio Server a password other than the default
+rstudio_password="docker"
+
 # Specify Docker volume for R libraries
 rocker_lib="rocker_lib_${R_version}"
 
@@ -23,18 +26,18 @@ rstudio_lib="/usr/local/lib/R/site-library"
 
 
 # Pull docker image
-docker pull $rocker_image
+docker image pull $rocker_image
 
 # Stop & Remove container, if running
-docker stop rstudio || true && docker rm rstudio || true >/dev/null
+docker container stop rstudio || true && docker container rm rstudio || true >/dev/null
 
 # Add first block to docker_run script, and mount homedir
 printf "Mounting local homedir...\n"
 echo -n "
 docker run \\
-    -ti \\
-    -d \\
+    -dit \\
     -p ${rstudio_port}:${rstudio_port} \\
+    -e PASSWORD=${rstudio_password} \\
     --name=rstudio \\
     --mount \\
         type=bind,source=\"${HOME}\",target=\"${rstudio_home}\" \\" > "$docker_run"
@@ -48,6 +51,6 @@ echo "$rocker_image" >> "$docker_run"
 sh "$docker_run"
 
 printf "\nRStudio server running on localhost:${rstudio_port}\n"
-printf "Username and password are both 'rstudio'\n"
+printf "Username is 'rstudio', and password is '$rstudio_password'\n"
 
 exit 0
